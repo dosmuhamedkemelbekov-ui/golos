@@ -915,7 +915,7 @@
           <div class="cards">
             ${nomination.nominees.map(nominee => `
               <article class="card" data-card data-nomination-id="${nomination.id}" data-nominee-id="${nominee.id}">
-                <img class="card__photo" data-src="${nominee.photo}" alt="${nominee.name}" loading="lazy">
+                <img class="card__photo" src="${nominee.photo}" alt="${nominee.name}">
                 <div class="card__fallback">${initials(nominee.name)}</div>
                 <div class="card__body">
                   <h4>${nominee.name}</h4>
@@ -930,8 +930,8 @@
       `).join("");
 
       nominationsRoot.querySelectorAll(".card__photo").forEach(image => {
-        image.dataset.originalSrc = image.dataset.src;
-        image.dataset.tryIndex = "0";
+        image.dataset.originalSrc = image.getAttribute("src");
+        image.dataset.tryIndex = String(getImageVariantIndex(image.dataset.originalSrc));
         image.addEventListener("error", () => {
           const originalSrc = image.dataset.originalSrc;
           const basePath = originalSrc.replace(/\?.*$/, "").replace(/\.(jpe?g|png|webp)$/i, "");
@@ -941,7 +941,7 @@
 
           if (nextSrc) {
             image.dataset.tryIndex = String(nextIndex);
-            image.src = withCacheBust(nextSrc);
+            image.src = nextSrc;
             return;
           }
 
@@ -952,13 +952,15 @@
           image.style.display = "block";
           image.nextElementSibling.style.display = "none";
         });
-        image.src = withCacheBust(image.dataset.originalSrc);
+        image.src = image.dataset.originalSrc;
       });
     }
 
-    function withCacheBust(path) {
-      const separator = path.includes("?") ? "&" : "?";
-      return `${path}${separator}v=${Date.now()}`;
+    function getImageVariantIndex(path) {
+      const cleanPath = path.replace(/\?.*$/, "").toLowerCase();
+      const extensions = [".jpg", ".jpeg", ".png", ".webp"];
+      const index = extensions.findIndex(extension => cleanPath.endsWith(extension));
+      return index === -1 ? -1 : index;
     }
 
     function getNominee(nominationId, nomineeId) {
