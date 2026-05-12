@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="kk-KZ">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAGI OSCAR | Студенттер дауыс беруі</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f9e498;
+            --dark: #0a0a0a;
+            --dark-card: #1a1a1a;
+            --white: #ffffff;
+            --gray: #a0a0a0;
+            --accent-red: #800020;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--dark);
+            color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .stars-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+            z-index: -1;
+        }
+
+        .spotlight {
+            position: fixed;
+            width: 40vw; height: 100vh;
+            background: radial-gradient(ellipse at top, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            top: 0; left: 30%; pointer-events: none;
+            z-index: -1;
+            filter: blur(50px);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Typography */
+        h1, h2, h3 { font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 2px; }
+        .gold-text { color: var(--gold); background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to bottom, transparent, var(--dark));
+        }
+
+        .hero h1 { font-size: 4rem; margin-bottom: 10px; }
+        .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; }
+
+        .btn-gold {
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--dark);
+            background: var(--gold);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: var(--transition);
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Auth Form */
+        #auth-section {
+            padding: 100px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: var(--dark-card);
+            padding: 40px;
+            border-radius: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--gold); font-size: 0.9rem; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            outline: none;
+            transition: var(--transition);
+        }
+        input:focus { border-color: var(--gold); background: #2a2a2a; }
+
+        .checkbox-group { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+        .checkbox-group input { width: auto; }
+
+        /* Voting Section */
+        #voting-section { padding: 80px 0; display: none; }
+        .nomination-block { margin-bottom: 80px; }
+        .nomination-header { text-align: center; margin-bottom: 40px; }
+        .nomination-header h2 { font-size: 2.5rem; margin-bottom: 10px; }
+        .nomination-header p { color: var(--gray); }
+
+        .nominees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Nominee Card */
+        .nominee-card {
+            background: var(--dark-card);
+            border: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nominee-card:hover { border-color: var(--gold); transform: translateY(-10px); }
+        .nominee-card.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .photo-frame {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--gold);
+            background: #333;
+        }
+
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        .nominee-card h3 { font-size: 1.1rem; margin-bottom: 5px; min-height: 50px; }
+        .nominee-card .group { color: var(--gold); font-size: 0.9rem; margin-bottom: 10px; }
+        .nominee-card .desc { font-size: 0.8rem; color: var(--gray); margin-bottom: 20px; height: 60px; overflow: hidden; }
+
+        .vote-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--gold);
+            background: transparent;
+            color: var(--gold);
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .selected .vote-btn { background: var(--gold); color: var(--dark); }
+
+        /* Footer Submit */
+        .footer-action {
+            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid #333;
+        }
+
+        /* Modal Summary */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--dark-card);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid var(--gold);
+            text-align: center;
+        }
+
+        .summary-list { text-align: left; margin: 20px 0; border-top: 1px solid #333; padding-top: 20px; }
+        .summary-item { margin-bottom: 10px; font-size: 0.9rem; display: flex; justify-content: space-between; }
+        .summary-item span { color: var(--gold); }
+
+        /* Success screen */
+        #thanks-screen {
+            display: none;
+            height: 100vh;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mobile adaptation */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nomination-header h2 { font-size: 1.8rem; }
+            .nominees-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Loader */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="stars-bg"></div>
+    <div class="spotlight"></div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1 class="gold-text">EAGI OSCAR</h1>
+        <p>Премия "EAGI Awards 2026" — Голосование студентов</p>
+        <button class="btn-gold" onclick="scrollToAuth()">Начать голосование</button>
+    </section>
+
+    <div class="container">
+        <!-- Auth Section -->
+        <section id="auth-section">
+            <div class="auth-card">
+                <h2 style="margin-bottom: 20px; text-align: center;" class="gold-text">Вход на голосование</h2>
+                <form id="student-form">
+                    <div class="form-group">
+                        <label>ФИО студента</label>
+                        <input type="text" id="std-name" placeholder="Введите имя и фамилию" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Группа</label>
+                        <input type="text" id="std-group" placeholder="Например: ИЯ 25-02" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email или Телефон</label>
+                        <input type="text" id="std-contact" placeholder="Для проверки статуса студента" required>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="std-confirm" required>
+                        <label for="std-confirm">Я являюсь студентом ЕАГИ</label>
+                    </div>
+                    <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px; clip-path: none;">Получить доступ</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Voting Section -->
+        <section id="voting-section">
+            <div id="nominations-container">
+                <!-- Сюда JS вставит номинации -->
+            </div>
+
+            <div class="footer-action">
+                <p id="error-msg" style="color: #ff4d4d; margin-bottom: 20px; display: none;">Пожалуйста, выберите номинанта в каждой номинации.</p>
+                <button class="btn-gold" onclick="showSummary()">Отправить мой голос</button>
+            </div>
+        </section>
+
+        <!-- Success Section -->
+        <section id="thanks-screen">
+            <h1 class="gold-text">Рахмет!</h1>
+            <p style="margin: 20px 0;">Ваш голос успешно принят.</p>
+            <p style="color: var(--gray);">Результаты будут объявлены на торжественной церемонии EAGI Awards.</p>
+        </section>
+    </div>
+
+    <!-- Modal Summary -->
+    <div class="modal" id="summary-modal">
+        <div class="modal-content">
+            <h2 class="gold-text">Ваш выбор</h2>
+            <div class="summary-list" id="summary-list">
+                <!-- Сюда JS вставит сводку -->
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-gold" style="background: #333; color: #fff; clip-path: none; flex: 1;" onclick="closeModal()">Назад</button>
+                <button class="btn-gold" style="clip-path: none; flex: 2;" id="confirm-submit-btn" onclick="finalSubmit()">
+                    <span class="loader" id="submit-loader"></span>
+                    Подтвердить и отправить
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ДАННЫЕ НОМИНАЦИЙ ---
+        const nominations = [
+            {
+                id: "discovery",
+                title: "Открытие года",
+                description: "Студент, который ярче всех проявил себя в этом учебном году.",
+                nominees: [
+                    { id: "dana", name: "Алтынбекова Дана", group: "ИЯ 25-02", photo: "images/dana.jpg", info: "Активное участие в научных проектах." },
+                    { id: "abylai", name: "Абылай Досымжан", group: "ШТ 25-01", photo: "images/abylai.jpg", info: "Инициативный лидер студенческого совета." },
+                    { id: "madi", name: "Мади Талгат", group: "П 24-01", photo: "images/madi.jpg", info: "Победитель республиканских дебатов." }
+                ]
+            },
+            {
+                id: "event",
+                title: "Событие года",
+                description: "Самое запоминающееся мероприятие института.",
+                nominees: [
+                    { id: "nauryz", name: "Наурыз Мейрамы", group: "ЕАГИ", photo: "images/nauryz.jpg", info: "Масштабное празднование с традициями." },
+                    { id: "miss", name: "Мисс и Мистер ЕАГИ", group: "ЕАГИ", photo: "images/miss.jpg", info: "Шоу талантов и красоты." },
+                    { id: "sport", name: "Спартакиада", group: "ЕАГИ", photo: "images/sport.jpg", info: "Спортивный дух и единство." }
+                ]
+            },
+            {
+                id: "curator",
+                title: "Лучший куратор",
+                description: "Ваш наставник и поддержка.",
+                nominees: [
+                    { id: "kur1", name: "Смагулова А. К.", group: "Кафедра Педагогики", photo: "images/c1.jpg", info: "Забота о каждом студенте." },
+                    { id: "kur2", name: "Иванов И. И.", group: "Кафедра ИЯ", photo: "images/c2.jpg", info: "Профессионализм и менторство." }
+                ]
+            }
+        ];
+
+        let userVotes = {}; // Хранение выбора { nominationId: nomineeId }
+        let studentData = {};
+
+        // --- Инициализация ---
+        function init() {
+            const container = document.getElementById('nominations-container');
+            nominations.forEach(nom => {
+                const section = document.createElement('div');
+                section.className = 'nomination-block';
+                section.innerHTML = `
+                    <div class="nomination-header">
+                        <h2 class="gold-text">${nom.title}</h2>
+                        <p>${nom.description}</p>
+                    </div>
+                    <div class="nominees-grid">
+                        ${nom.nominees.map(person => `
+                            <div class="nominee-card" id="card-${person.id}" onclick="selectNominee('${nom.id}', '${person.id}')">
+                                <div class="photo-frame">
+                                    <img src="${person.photo}" alt="${person.name}" onerror="this.src='https://via.placeholder.com/150/222/d4af37?text=EAGI'">
+                                </div>
+                                <h3>${person.name}</h3>
+                                <div class="group">${person.group}</div>
+                                <div class="desc">${person.info}</div>
+                                <button class="vote-btn" id="btn-${person.id}">Голосовать</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+        }
+
+        // --- Логика выбора ---
+        function selectNominee(nomId, nomineeId) {
+            // Удаляем выделение у других в этой номинации
+            const nomData = nominations.find(n => n.id === nomId);
+            nomData.nominees.forEach(p => {
+                document.getElementById(`card-${p.id}`).classList.remove('selected');
+                document.getElementById(`btn-${p.id}`).innerText = 'Голосовать';
+            });
+
+            // Выделяем текущий выбор
+            document.getElementById(`card-${nomineeId}`).classList.add('selected');
+            document.getElementById(`btn-${nomineeId}`).innerText = 'Выбрано';
+            
+            userVotes[nomId] = nomineeId;
+            document.getElementById('error-msg').style.display = 'none';
+        }
+
+        // --- Скролл ---
+        function scrollToAuth() {
+            document.getElementById('auth-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Обработка формы входа ---
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            studentData = {
+                name: document.getElementById('std-name').value,
+                group: document.getElementById('std-group').value,
+                contact: document.getElementById('std-contact').value
+            };
+            
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('voting-section').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- Сводка ---
+        function showSummary() {
+            // Проверка: все ли номинации выбраны
+            if (Object.keys(userVotes).length < nominations.length) {
+                const msg = document.getElementById('error-msg');
+                msg.style.display = 'block';
+                msg.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            const list = document.getElementById('summary-list');
+            list.innerHTML = '';
+            
+            nominations.forEach(nom => {
+                const selectedId = userVotes[nom.id];
+                const nominee = nom.nominees.find(p => p.id === selectedId);
+                list.innerHTML += `
+                    <div class="summary-item">
+                        <div><strong>${nom.title}:</strong></div>
+                        <span>${nominee.name}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('summary-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('summary-modal').style.display = 'none';
+        }
+
+        // --- ОТПРАВКА ДАННЫХ В GOOGLE SHEETS ---
+        async function finalSubmit() {
+            const btn = document.getElementById('confirm-submit-btn');
+            const loader = document.getElementById('submit-loader');
+            
+            btn.disabled = true;
+            loader.style.display = 'inline-block';
+
+            // Подготовка данных
+            const payload = {
+                ...studentData,
+                votes: userVotes,
+                timestamp: new Date().toLocaleString()
+            };
+
+            // URL вашего Google Apps Script (нужно заменить после развертывания скрипта)
+            const SCRIPT_URL = "ВАШ_URL_GOOGLE_APPS_SCRIPT";
+
+            try {
+                // Если SCRIPT_URL не задан, имитируем успех для теста
+                if (SCRIPT_URL === "ВАШ_URL_GOOGLE_APPS_SCRIPT") {
+                    console.log("Данные для отправки:", payload);
+                    setTimeout(() => {
+                        showFinalSuccess();
+                    }, 1500);
+                    return;
+                }
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Важно для Google Script
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                showFinalSuccess();
+            } catch (error) {
+                alert("Ошибка при отправке. Попробуйте еще раз.");
+                btn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+
+        function showFinalSuccess() {
+            document.getElementById('summary-modal').style.display = 'none';
+            document.getElementById('voting-section').style.display = 'none';
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('thanks-screen').style.display = 'flex';
+            window.scrollTo({ top: 0 });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
