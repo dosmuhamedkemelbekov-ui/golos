@@ -935,7 +935,12 @@
         image.addEventListener("error", () => {
           const originalSrc = image.dataset.originalSrc;
           const basePath = originalSrc.replace(/\?.*$/, "").replace(/\.(jpe?g|png|webp)$/i, "");
-          const variants = [".jpg", ".jpeg", ".png", ".webp"].map(extension => `${basePath}${extension}`);
+          const fileNameBase = basePath.split("/").pop();
+          const extensions = [".jpg", ".jpeg", ".png", ".webp"];
+          const variants = [
+            ...extensions.map(extension => `${basePath}${extension}`),
+            ...extensions.map(extension => `${fileNameBase}${extension}`)
+          ];
           const nextIndex = Number(image.dataset.tryIndex) + 1;
           const nextSrc = variants[nextIndex];
 
@@ -1022,7 +1027,7 @@
         return;
       }
 
-      if (GOOGLE_SCRIPT_URL.includes("PASTE_YOUR")) {
+      if (GOOGLE_SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbzFZhxOELzlsh9XQj6pVa89cc-5bFYnE_3yuyIlETUZTukWolFL7hTFlEXeUfC0uJ73/exec")) {
         showNotice(voteNotice, "Вставьте ссылку Google Apps Script Web App в переменную GOOGLE_SCRIPT_URL.", "error");
         return;
       }
